@@ -19,6 +19,7 @@ public class StudentManagementController {
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN, ROLE_ADMINTRAINER')")
     public List<Student>getAllStudents(){
+
         return STUDENTS;
     }
 
