@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,14 @@ import java.util.stream.Collectors;
 
 public class JwtTokenVerifier extends OncePerRequestFilter {
 
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
+
+    public JwtTokenVerifier(SecretKey secretKey, JwtConfig jwtConfig) {
+        this.secretKey = secretKey;
+        this.jwtConfig = jwtConfig;
+    }
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest httpServletRequest
@@ -28,18 +37,18 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
             , FilterChain filterChain) throws ServletException, IOException {
 
 
-        String  key="securesecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecure";
-        String authorizationHeader=httpServletRequest.getHeader("Authorization");
+       //String  key="securesecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecure";
+        String authorizationHeader=httpServletRequest.getHeader(jwtConfig.getAuthorizationHeader());
 
-        if(Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")){
+        if(Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith(jwtConfig.getTokenPrefix())){
             filterChain.doFilter(httpServletRequest,httpServletResponse);
             return;
         }
-        String token=authorizationHeader.replace("Bearer ","");
+        String token=authorizationHeader.replace(jwtConfig.getTokenPrefix(),"");
         try{
 
             Jws<Claims> claimsJws = Jwts.parser()
-                    .setSigningKey(Keys.hmacShaKeyFor(key.getBytes()))
+                    .setSigningKey(/*Keys.hmacShaKeyFor(key.getBytes())*/secretKey)
                     .parseClaimsJws(token);
             Claims body=claimsJws.getBody();
             String username = body.getSubject();
