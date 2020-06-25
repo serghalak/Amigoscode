@@ -2,6 +2,7 @@ package com.example.demo.security;
 
 import com.example.demo.auth.ApplicationUserDao;
 import com.example.demo.auth.ApplicationUserService;
+import com.example.demo.jwt.JwtTokenVerifier;
 import com.example.demo.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +49,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)//for jwt auth
                 .and()
                 .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))//for jwt auth
+                .addFilterAfter(new JwtTokenVerifier(), JwtUsernameAndPasswordAuthenticationFilter.class)//for jwt auth its means that this filter JwtTokenVerifier goes after this JwtUsernameAndPasswordAuthenticationFilter
                 .authorizeRequests()
                 .antMatchers("/","index","/css/*","/js/*").permitAll()
                 .antMatchers("/api/**").hasRole(ApplicationUserRole.STUDENT.name())
