@@ -40,6 +40,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        System.out.println("..................ApplicationUserRole.STUDENT.name(): "
+                + ApplicationUserRole.STUDENT.name());
         http
                 .csrf().disable()
 //                .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
